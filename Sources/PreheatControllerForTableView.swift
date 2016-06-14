@@ -17,7 +17,7 @@ public class PreheatControllerForTableView: PreheatController {
     /// Determines how far the user needs to refresh preheat window.
     public var preheatRectUpdateRatio: CGFloat = 0.33
 
-    private var previousContentOffset = CGPointZero
+    private var previousContentOffset = CGPoint.zero
 
     /// Initializes the receiver with a given table view.
     public init(tableView: UITableView) {
@@ -30,7 +30,7 @@ public class PreheatControllerForTableView: PreheatController {
             if enabled {
                 updatePreheatRect()
             } else {
-                previousContentOffset = CGPointZero
+                previousContentOffset = CGPoint.zero
                 updatePreheatIndexPaths([])
             }
         }
@@ -43,7 +43,7 @@ public class PreheatControllerForTableView: PreheatController {
      */
     public override func reset() {
         super.reset()
-        previousContentOffset = CGPointZero
+        previousContentOffset = CGPoint.zero
         if enabled {
             updatePreheatRect()
         }
@@ -57,23 +57,23 @@ public class PreheatControllerForTableView: PreheatController {
     }
 
     private func updatePreheatRect() {
-        let updateMargin = CGRectGetHeight(tableView.bounds) * preheatRectUpdateRatio
+        let updateMargin = tableView.bounds.height * preheatRectUpdateRatio
         let contentOffset = tableView.contentOffset
-        guard distanceBetweenPoints(contentOffset, previousContentOffset) > updateMargin || previousContentOffset == CGPointZero else {
+        guard distanceBetweenPoints(contentOffset, previousContentOffset) > updateMargin || previousContentOffset == CGPoint.zero else {
             return
         }
-        let scrollDirection: ScrollDirection = (contentOffset.y >= previousContentOffset.y || previousContentOffset == CGPointZero) ? .Forward : .Backward
+        let scrollDirection: ScrollDirection = (contentOffset.y >= previousContentOffset.y || previousContentOffset == CGPoint.zero) ? .forward : .backward
 
         previousContentOffset = contentOffset
         let preheatRect = preheatRectInScrollDirection(scrollDirection)
-        let preheatIndexPaths = Set(tableView.indexPathsForRowsInRect(preheatRect) ?? []).subtract(tableView.indexPathsForVisibleRows ?? [])
+        let preheatIndexPaths = Set(tableView.indexPathsForRows(in: preheatRect) ?? []).subtracting(tableView.indexPathsForVisibleRows ?? [])
         updatePreheatIndexPaths(sortIndexPaths(preheatIndexPaths, inScrollDirection: scrollDirection))
     }
 
-    private func preheatRectInScrollDirection(direction: ScrollDirection) -> CGRect {
+    private func preheatRectInScrollDirection(_ direction: ScrollDirection) -> CGRect {
         let viewport = CGRect(origin: tableView.contentOffset, size: tableView.bounds.size)
-        let height = CGRectGetHeight(viewport) * preheatRectRatio
-        let y = (direction == .Forward) ? CGRectGetMaxY(viewport) : CGRectGetMinY(viewport) - height
-        return CGRectIntegral(CGRect(x: 0, y: y, width: CGRectGetWidth(viewport), height: height))
+        let height = viewport.height * preheatRectRatio
+        let y = (direction == .forward) ? viewport.maxY : viewport.minY - height
+        return CGRect(x: 0, y: y, width: viewport.width, height: height).integral
     }
 }

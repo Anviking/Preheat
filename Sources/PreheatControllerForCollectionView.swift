@@ -21,7 +21,7 @@ public class PreheatControllerForCollectionView: PreheatController {
     /// Determines how far the user needs to refresh preheat window.
     public var preheatRectUpdateRatio: CGFloat = 0.33
     
-    private var previousContentOffset = CGPointZero
+    private var previousContentOffset = CGPoint.zero
 
     /// Initializes the receiver with a given collection view.
     public init(collectionView: UICollectionView) {
@@ -35,7 +35,7 @@ public class PreheatControllerForCollectionView: PreheatController {
             if enabled {
                 updatePreheatRect()
             } else {
-                previousContentOffset = CGPointZero
+                previousContentOffset = CGPoint.zero
                 updatePreheatIndexPaths([])
             }
         }
@@ -48,7 +48,7 @@ public class PreheatControllerForCollectionView: PreheatController {
      */
     public override func reset() {
         super.reset()
-        previousContentOffset = CGPointZero
+        previousContentOffset = CGPoint.zero
         if enabled {
             updatePreheatRect()
         }
@@ -63,38 +63,38 @@ public class PreheatControllerForCollectionView: PreheatController {
 
     private func updatePreheatRect() {
         let scrollAxis = collectionViewLayout.scrollDirection
-        let updateMargin = (scrollAxis == .Vertical ? CGRectGetHeight : CGRectGetWidth)(collectionView.bounds) * preheatRectUpdateRatio
+        let updateMargin = (scrollAxis == .vertical ? CGRectGetHeight : CGRectGetWidth)(collectionView.bounds) * preheatRectUpdateRatio
         let contentOffset = collectionView.contentOffset
-        guard distanceBetweenPoints(contentOffset, previousContentOffset) > updateMargin || previousContentOffset == CGPointZero else {
+        guard distanceBetweenPoints(contentOffset, previousContentOffset) > updateMargin || previousContentOffset == CGPoint.zero else {
             return
         }
         // Update preheat window
-        let scrollDirection: ScrollDirection = ((scrollAxis == .Vertical ? contentOffset.y >= previousContentOffset.y : contentOffset.x >= previousContentOffset.x) || previousContentOffset == CGPointZero) ? .Forward : .Backward
+        let scrollDirection: ScrollDirection = ((scrollAxis == .vertical ? contentOffset.y >= previousContentOffset.y : contentOffset.x >= previousContentOffset.x) || previousContentOffset == CGPoint.zero) ? .forward : .backward
         
         previousContentOffset = contentOffset
         let preheatRect = preheatRectInScrollDirection(scrollDirection)
-        let preheatIndexPaths = indexPathsForElementsInRect(preheatRect).subtract(collectionView.indexPathsForVisibleItems())
+        let preheatIndexPaths = indexPathsForElementsInRect(preheatRect).subtracting(collectionView.indexPathsForVisibleItems())
         updatePreheatIndexPaths(sortIndexPaths(preheatIndexPaths, inScrollDirection: scrollDirection))
     }
     
-    private func preheatRectInScrollDirection(direction: ScrollDirection) -> CGRect {
+    private func preheatRectInScrollDirection(_ direction: ScrollDirection) -> CGRect {
         let viewport = CGRect(origin: collectionView.contentOffset, size: collectionView.bounds.size)
         switch collectionViewLayout.scrollDirection {
-        case .Vertical:
-            let height = CGRectGetHeight(viewport) * preheatRectRatio
-            let y = (direction == .Forward) ? CGRectGetMaxY(viewport) : CGRectGetMinY(viewport) - height
-            return CGRectIntegral(CGRect(x: 0, y: y, width: CGRectGetWidth(viewport), height: height))
-        case .Horizontal:
-            let width = CGRectGetWidth(viewport) * preheatRectRatio
-            let x = (direction == .Forward) ? CGRectGetMaxX(viewport) : CGRectGetMinX(viewport) - width
-            return CGRectIntegral(CGRect(x: x, y: 0, width: width, height: CGRectGetHeight(viewport)))
+        case .vertical:
+            let height = viewport.height * preheatRectRatio
+            let y = (direction == .forward) ? viewport.maxY : viewport.minY - height
+            return CGRect(x: 0, y: y, width: viewport.width, height: height).integral
+        case .horizontal:
+            let width = viewport.width * preheatRectRatio
+            let x = (direction == .forward) ? viewport.maxX : viewport.minX - width
+            return CGRect(x: x, y: 0, width: width, height: viewport.height).integral
         }
     }
     
-    private func indexPathsForElementsInRect(rect: CGRect) -> Set<NSIndexPath> {
-        guard let layoutAttributes = collectionViewLayout.layoutAttributesForElementsInRect(rect) else {
+    private func indexPathsForElementsInRect(_ rect: CGRect) -> Set<IndexPath> {
+        guard let layoutAttributes = collectionViewLayout.layoutAttributesForElements(in: rect) else {
             return []
         }
-        return Set(layoutAttributes.filter{ return $0.representedElementCategory == .Cell }.map{ return $0.indexPath })
+        return Set(layoutAttributes.filter{ return $0.representedElementCategory == .cell }.map{ return $0.indexPath })
     }
 }

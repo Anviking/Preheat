@@ -158,6 +158,7 @@
 					};
 					0CD20B141CA45C1E006BA4B9 = {
 						CreatedOnToolsVersion = 7.2.1;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -366,6 +367,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.Preheat;
 				PRODUCT_NAME = Preheat;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -384,6 +386,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.Preheat;
 				PRODUCT_NAME = Preheat;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
